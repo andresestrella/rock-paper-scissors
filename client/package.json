@@ -1,0 +1,20 @@
+{
+  "name": "client",
+  "version": "1.0.0",
+  "description": "web socket client for rock-paper-scissors game",
+  "type": "module",
+  "main": "index.js",
+  "bin": {
+    "websocket-client": "./websocket-client.js"
+  },
+  "scripts": {
+    "start": "node websocket-client.js",
+    "run": "node websocket-client.js",
+    "test": "test"
+  },
+  "author": "andres",
+  "license": "ISC",
+  "dependencies": {
+    "@microsoft/signalr": "^7.0.11"
+  }
+}
