@@ -8,10 +8,12 @@ namespace rps_server.Hubs
     public class GameHub : Hub
     {
         private readonly IUserRepository _userRepository;
+        private readonly IMatchRepository _matchRepository;
 
-        public GameHub(IUserRepository userRepository)
+        public GameHub(IUserRepository userRepository, IMatchRepository matchRepository)
         {
             _userRepository = userRepository;
+            _matchRepository = matchRepository;
         }
 
         public async Task IdentifyUser(string userName)
@@ -46,40 +48,81 @@ namespace rps_server.Hubs
                 }
             }
             //send StartGame signal to user
-            /*            await Clients
-                            .Client(Context.ConnectionId)
-                            .SendAsync("StartGame", message);*/
-            /*                .SendAsync("StartGame", responseUser.Id.ToString(), message);*/
-            await Clients.Client(Context.ConnectionId).SendAsync("StartGame", responseUser.Id, message);
-        }
-
-        public async Task FetchStats(string userName)
-        {
-            //fetch user stats from databasea
-            //return stats to user
             await Clients
                 .Client(Context.ConnectionId)
-                .SendAsync(
-                    "ReceiveStats",
-                    "You have played 0 games, won 0 games, and lost 0 games."
-                );
+                .SendAsync("StartGame", responseUser.Id, message);
         }
 
-        public async Task PlayMove(string userName, string move)
+        public async Task FetchStats(int userId)
         {
-            //create Match object
+            string message = "";
+            //get all matches for user
+            var matches = _matchRepository.GetAllByUserId(userId);
 
-            //randomly generate computer move
+            //calculate stats
+            int totalMatches = matches.Count();
+            int totalWins = matches.Where(x => x.Result == Match.MatchResult.Win).Count();
+            int totalLosses = matches.Where(x => x.Result == Match.MatchResult.Lose).Count();
+            int totalDraws = matches.Where(x => x.Result == Match.MatchResult.Draw).Count();
+            DateTime mostRecentMatch = matches.Max(x => x.Date);
+
+            message =
+                "You have played "
+                + totalMatches
+                + " games, won "
+                + totalWins
+                + " games, and lost "
+                + totalLosses
+                + " games.\nYour most recent match was on "
+                + mostRecentMatch.ToString("MMMM dd, yyyy")
+                + ".\n";
+
+            await Clients.Client(Context.ConnectionId).SendAsync("ReceiveStats", message);
+        }
+
+        public async Task PlayMove(int userId, string move)
+        {
             string computerMove = GenerateRandomChoice();
             string playerMove = move.ToLower();
-            Match.MatchResult result;
+            Match.MatchResult result = DetermineWinner(playerMove, computerMove);
             string message = "";
+            switch (result)
+            {
+                case Match.MatchResult.Draw:
+                    message =
+                        "You played " + move + ".\nI played " + computerMove + ".\nIt's a draw!";
+                    break;
+                case Match.MatchResult.Win:
+                    message = "You played " + move + ".\nI played " + computerMove + ".\nYou win!";
+                    break;
+                case Match.MatchResult.Lose:
+                    message = "You played " + move + ".\nI played " + computerMove + ".\nYou lose!";
+                    break;
+            }
 
-            //compare moves and add results to match
+            //update database
+            User matchedUser = _userRepository.GetById(userId);
+            Match resultMatch = new Match
+            {
+                Result = result,
+                PlayerMove = playerMove,
+                ComputerMove = computerMove,
+                Date = DateTime.UtcNow,
+                UserId = userId,
+            };
+            matchedUser.Matches.Add(resultMatch);
+            _userRepository.Save();
+
+            //send result message to user
+            await Clients.Client(Context.ConnectionId).SendAsync("ReceiveResult", message);
+        }
+
+        private Match.MatchResult DetermineWinner(string playerMove, string computerMove)
+        {
             if (computerMove == playerMove)
-            { //draw
-                result = Match.MatchResult.Draw;
-                message = "You played " + move + ".\nI played " + computerMove + ".\nIt's a draw!";
+            {
+                //draw
+                return Match.MatchResult.Draw;
             }
             else if (
                 (computerMove == "scissors" && playerMove == "rock")
@@ -88,9 +131,7 @@ namespace rps_server.Hubs
             )
             {
                 //player wins
-                result = Match.MatchResult.Win;
-                message =
-                    "You played " + move + ".\nI played " + computerMove + ".\nYou " + "win" + "!";
+                return Match.MatchResult.Win;
             }
             else if (
                 (computerMove == "rock" && playerMove == "scissors")
@@ -98,16 +139,14 @@ namespace rps_server.Hubs
                 || (computerMove == "scissors" && playerMove == "paper")
             )
             {
-                //computer wins
-                result = Match.MatchResult.Lose;
-                message =
-                    "You played " + move + ".\nI played " + computerMove + ".\nYou " + "lose" + "!";
+                //player loses
+                return Match.MatchResult.Lose;
             }
-
-            //update database
-
-            //send result signal to user
-            await Clients.Client(Context.ConnectionId).SendAsync("ReceiveResult", message);
+            else
+            {
+                //error
+                throw new AppException("Invalid move");
+            }
         }
 
         private static string GenerateRandomChoice()

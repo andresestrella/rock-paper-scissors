@@ -63,14 +63,14 @@ export function configure() {
                 .invoke("IdentifyUser", userName)
                 .catch((err) => console.error(err.toString()));
         },
-        playMove: function(userName, move) {
+        playMove: function(userId, move) {
             // try {
             //     await connection.invoke("PlayMove", userName, move);
             // } catch (err) {
             //     console.error(err);
             // }
             connection
-                .invoke("PlayMove", userName, move)
+                .invoke("PlayMove", userId, move)
                 .catch((err) => console.error(err.toString()));
         },
     };

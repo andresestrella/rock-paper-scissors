@@ -53,18 +53,19 @@ function promptForMove() {
     rl.question("> ", (input) => {
         if (input === "1") {
             // console.log("You chose Rock");
-            gameClient.playMove(userName, "Rock");
+            gameClient.playMove(userId, "Rock");
         } else if (input === "2") {
             // console.log("You chose Paper");
-            gameClient.playMove(userName, "Paper");
+            gameClient.playMove(userId, "Paper");
         } else if (input === "3") {
             // console.log("You chose Scissors");
-            gameClient.playMove(userName, "Scissors");
+            gameClient.playMove(userId, "Scissors");
         } else if (input === "q") {
             console.log("\nYeah I got bored anyways...\n");
             startGame();
         } else {
             console.log("Invalid input");
+            promptForMove();
         }
     });
 }
@@ -78,7 +79,7 @@ function startGame() {
                 promptForMove();
             } else if (input === "2") {
                 console.log("You chose to view stats");
-                gameClient.fetchStats(userName);
+                gameClient.fetchStats(userId);
             } else if (input === "q") {
                 gameClient.connection.stop();
             } else {

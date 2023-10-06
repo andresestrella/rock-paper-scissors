@@ -30,15 +30,17 @@ namespace rps_server.Migrations
                 name: "Matches",
                 columns: table => new
                 {
-                    MatchId = table.Column<int>(type: "integer", nullable: false)
+                    Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     Result = table.Column<int>(type: "integer", nullable: false),
+                    PlayerMove = table.Column<string>(type: "text", nullable: false),
+                    ComputerMove = table.Column<string>(type: "text", nullable: false),
                     Date = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     UserId = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Matches", x => x.MatchId);
+                    table.PrimaryKey("PK_Matches", x => x.Id);
                     table.ForeignKey(
                         name: "FK_Matches_Users_UserId",
                         column: x => x.UserId,

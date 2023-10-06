@@ -17,6 +17,5 @@ public class User
     [JsonIgnore]
     public string PasswordHash { get; set; } = "placeholder until auth is implemented";
 
-    [InverseProperty("User")]
     public ICollection<Match> Matches { get; } = new List<Match>();
 }

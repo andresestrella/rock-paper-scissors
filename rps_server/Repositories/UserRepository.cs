@@ -16,6 +16,7 @@ namespace rps_server.Repository
         void Update(int id, User user);
         void Delete(int id);
         User Authenticate(string username);
+        void Save();
     }
 
     public class UserRepository : IUserRepository
@@ -57,10 +58,9 @@ namespace rps_server.Repository
                 throw new AppException("Password is required");
             if (_context.Users.Any(x => x.UserName == user.UserName))
                 throw new AppException("Username \"" + user.UserName + "\" is already taken");
-            // wrap the caller of this function in a try catch that catches ApPException to and flow from there
-
             //hash password
             // user.PasswordHash = BCrypt.HashPassword(user.PasswordHash);
+
             //save to db
             _context.Users.Add(user);
             _context.SaveChanges();
@@ -68,18 +68,19 @@ namespace rps_server.Repository
 
         public void Update(int id, User user)
         {
-            throw new System.NotImplementedException();
+            // var updatedUser = getUser(id);
+
+
+        // copy model to user and save
+        _context.Users.Update(user);
+        _context.SaveChanges();
         }
 
         public void Delete(int UserId)
         {
-            //First, fetch the User details based on the EmployeeID id
             User user = _context.Users.Find(UserId);
-
-            //If the employee object is not null, then remove the employee
             if (user != null)
             {
-                //This will mark the Entity State as Deleted
                 _context.Users.Remove(user);
             }
         }

@@ -12,7 +12,7 @@ using rps_server.Data;
 namespace rps_server.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20231006024959_InitialCreate")]
+    [Migration("20231006082220_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -27,14 +27,22 @@ namespace rps_server.Migrations
 
             modelBuilder.Entity("rps_server.Entities.Match", b =>
                 {
-                    b.Property<int>("MatchId")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("MatchId"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("ComputerMove")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("Date")
                         .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("PlayerMove")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.Property<int>("Result")
                         .HasColumnType("integer");
@@ -42,7 +50,7 @@ namespace rps_server.Migrations
                     b.Property<int>("UserId")
                         .HasColumnType("integer");
 
-                    b.HasKey("MatchId");
+                    b.HasKey("Id");
 
                     b.HasIndex("UserId");
 
