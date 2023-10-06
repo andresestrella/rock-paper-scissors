@@ -9,14 +9,14 @@ builder.Services.AddSignalR();
 builder.Services.AddDbContext<DataContext>();
 builder.Services.AddCors(options =>
 {
-    options.AddDefaultPolicy(
-        builder =>
-        {
-            builder.WithOrigins("*", "https://example.com", "localhost")
-                .AllowAnyHeader()
-                .AllowAnyMethod()
-                .AllowCredentials();
-        });
+    options.AddDefaultPolicy(builder =>
+    {
+        builder
+            .WithOrigins("*", "https://example.com", "localhost")
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials();
+    });
 });
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IMatchRepository, MatchRepository>();
@@ -29,9 +29,6 @@ if (!app.Environment.IsDevelopment())
     app.UseExceptionHandler("/Error");
     app.UseHsts();
 }
-
-// app.UseRouting();
-// app.UseAuthorization();
 
 // UseCors must be called before MapHub.
 app.UseCors();

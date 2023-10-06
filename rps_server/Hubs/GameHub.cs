@@ -36,7 +36,7 @@ namespace rps_server.Hubs
             {
                 if (e.Message == "User not found")
                 {
-                    //else, add user to database
+                    //else, create and save new user to db
                     responseUser = new User { UserName = userName };
                     _userRepository.Create(responseUser);
                     message =
@@ -56,7 +56,6 @@ namespace rps_server.Hubs
         public async Task FetchStats(int userId)
         {
             string message = "";
-            //get all matches for user
             var matches = _matchRepository.GetAllByUserId(userId);
 
             //calculate stats
@@ -157,7 +156,6 @@ namespace rps_server.Hubs
             // Generate a random number between 0 and 2 (inclusive)
             int randomNumber = random.Next(0, 3);
 
-            // Map the random number to 'r', 'p', or 's'
             string randomChoice;
             switch (randomNumber)
             {

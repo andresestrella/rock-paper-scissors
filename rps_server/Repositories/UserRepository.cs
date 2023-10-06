@@ -1,7 +1,6 @@
 using rps_server.Data;
 using rps_server.Entities;
 using rps_server.Helpers;
-
 // using BCrypt.Net;
 
 namespace rps_server.Repository
@@ -68,10 +67,6 @@ namespace rps_server.Repository
 
         public void Update(int id, User user)
         {
-            // var updatedUser = getUser(id);
-
-
-        // copy model to user and save
         _context.Users.Update(user);
         _context.SaveChanges();
         }
@@ -116,7 +111,6 @@ namespace rps_server.Repository
         }
 
         // helper methods
-
 
         private User getUser(int id)
         {
