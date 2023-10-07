@@ -5,9 +5,6 @@ export function configure() {
         .withUrl("http://localhost:5023/gameHub")
         .configureLogging(signalR.LogLevel.Critical)
         .build();
-    // .withUrl("https://localhost:7106/gameHub", signalR.HttpTransportType.WebSockets ) //signalR client only works with HTTP
-    // .withAutomaticReconnect()
-    // .withAutomaticReconnect([0, 2000, 10000, 30000]) yields the default behavior
 
     connection.onreconnecting((error) => {
         console.log(
@@ -64,11 +61,6 @@ export function configure() {
                 .catch((err) => console.error(err.toString()));
         },
         playMove: function(userId, move) {
-            // try {
-            //     await connection.invoke("PlayMove", userName, move);
-            // } catch (err) {
-            //     console.error(err);
-            // }
             connection
                 .invoke("PlayMove", userId, move)
                 .catch((err) => console.error(err.toString()));
